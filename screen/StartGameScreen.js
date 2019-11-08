@@ -1,16 +1,18 @@
-import React, {useState} from 'react';
-import { 
-    View, 
-    StyleSheet, 
-    Text, 
-    Button, 
-    TouchableWithoutFeedback, 
-    Keyboard 
+import React, { useState } from 'react';
+import {
+    View,
+    StyleSheet,
+    Text,
+    Button,
+    TouchableWithoutFeedback,
+    Keyboard,
+    Alert
 } from 'react-native';
 
 // custom import Component
 import Card from './../components/Card';
 import Input from './../components/Input';
+import NumberSummary from './../components/NumberSummary';
 
 // custom import Constant 
 import Color from './../constants/color';
@@ -22,7 +24,7 @@ const StartGameScreen = props => {
     const [selectedNumber, setSelectedNumber] = useState()
 
     const numberInputHandler = inputText => {
-        setEnteredValue(inputText.replace(/[^0-9]/g,''));
+        setEnteredValue(inputText.replace(/[^0-9]/g, ''));
     };
 
     const resetInputHandler = () => {
@@ -32,19 +34,32 @@ const StartGameScreen = props => {
 
     const confirmInputHandler = () => {
         const chosenNumber = parseInt(enteredValue);
-        if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99){
+        if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+            Alert.alert(
+                'Invalid number!',
+                'Number has to be a number between 1 and 99',
+                [{ text: 'Okay', style: 'destructive', onPress: resetInputHandler }]
+            )
             return;
         }
         setConfirmed(true);
         setEnteredValue('');
         // convert text to a number
         setSelectedNumber(parseInt(enteredValue));
+        Keyboard.dismiss();
     }
 
     let content;
 
-    if (confirmed){
-        content = <Card><View><Text>{selectedNumber}</Text></View></Card>
+    if (confirmed) {
+        content = (
+            <Card style={styles.summaryContainer}>
+                <Text>You Selected</Text>
+                <NumberSummary>{selectedNumber}</NumberSummary>
+                <Button title="START GAME" 
+                    onPress={() => props.onStartGame(selectedNumber)}/>
+            </Card>
+        );
     }
 
     return (
@@ -60,8 +75,8 @@ const StartGameScreen = props => {
                         autoCorrect={false}
                         keyboardType="number-pad"
                         maxLength={2}
-                        onChangeText = {numberInputHandler}
-                        value = {enteredValue}
+                        onChangeText={numberInputHandler}
+                        value={enteredValue}
                     />
                     <View style={styles.buttonContainer}>
                         <View style={styles.button}>
@@ -112,6 +127,11 @@ const styles = StyleSheet.create({
         width: 50,
         alignItems: 'center',
         textAlign: 'center'
+    }, 
+    summaryContainer: {
+        justifyContent: 'center', 
+        alignItems: 'center',
+        marginTop: 10
     }
 });
 
