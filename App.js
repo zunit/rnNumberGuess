@@ -4,19 +4,32 @@ import { StyleSheet, Text, View } from 'react-native';
 import Header from './components/Header';
 import StartGameScreen from './screen/StartGameScreen';
 import GameScreen from './screen/GameScreen';
-
+import GameOverScreen from './screen/GameOverScreen';
 
 export default function App() {
   const [userNumber, setUserNumber] = useState();
+  const [guessRound, setGuessRounds] = useState(0);
+
+  const restartGameHandler = () =>{
+    setGuessRounds(0);
+    setUserNumber(null);
+  }
 
   const startGameHandler = (selectedNumber) => {
     setUserNumber(selectedNumber);
+    setGuessRounds(0); 
   };
+
+  const gameOverHandler = (round) => {
+    setGuessRounds(round);
+  }
 
   let content = <StartGameScreen onStartGame = {startGameHandler}/>;
 
-  if (userNumber){
-    content = <GameScreen userChoice={userNumber}/>
+  if (userNumber && guessRound <= 0){
+    content = <GameScreen userChoice={userNumber} onGameOver = {gameOverHandler}/>
+  } else if (guessRound > 0){
+    content = <GameOverScreen round={guessRound} selectNumber={userNumber} replayGame = {restartGameHandler} />;
   }
 
 
@@ -26,6 +39,7 @@ export default function App() {
       <Header title="Guess the Number" />
       {/* <StartGameScreen />
       <GameScreen /> */}
+      {/* <GameOverScreen/> */}
       {content}
     </View>
   );
